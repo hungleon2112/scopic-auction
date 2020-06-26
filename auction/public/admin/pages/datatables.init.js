@@ -9,9 +9,9 @@ $(document).ready(function() {
         "processing": false
     });
     showLoaderAndHideAfterEventFinished(table);
-    $('.dataTables_filter input').attr('placeholder', 'Minimum 3 characters').off()
+    $('.dataTables_filter input').attr('placeholder', 'Minimum 2 characters').off()
         .on('keyup', function() {
-            if(this.value.trim().length > 2 || this.value.trim().length === 0){
+            if(this.value.trim().length > 1 || this.value.trim().length === 0){
                 table.search( this.value ).draw();
             }
         });

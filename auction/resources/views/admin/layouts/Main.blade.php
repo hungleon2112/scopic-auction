@@ -24,6 +24,7 @@
     <link href="{{asset('admin/plugins/datatables/rowReorder.min.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('admin/plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css')}}" rel="stylesheet">
     <link href="{{asset('admin/plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css')}}" rel="stylesheet">
+    
 </head>
 
 

@@ -17,7 +17,7 @@
                                 Submit
                             </button>
                             @includeWhen($item->isDeletable(), 'admin.layouts.DeleteButton')
-                            @includeUnless($item->isDeletable(), 'admin.layouts.DisabledDeleteButton', ['text' => sprintf(Constant::TOOLTIP_DISABLED_DELETE_BUTTON, 'order(s)')])
+                            @includeUnless($item->isDeletable(), 'admin.layouts.DisabledDeleteButton', ['text' => sprintf(Constant::TOOLTIP_DISABLED_DELETE_BUTTON, 'bid')])
                         </div>
                     </form>
                     @includeWhen($item->isDeletable(), 'admin.layouts.DeleteForm', ['url' => route('items.destroy', $id)])
@@ -25,4 +25,6 @@
             </div>
         </div>
     </div>
+    @includeWhen($item->canSetBid(), 'admin.layouts.SetBidButton', ['id' => $id])
+    @includeWhen(!$item->canSetBid(), 'admin.layouts.BidHistory')
 @endsection

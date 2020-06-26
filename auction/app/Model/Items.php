@@ -22,7 +22,12 @@ class Items extends Model
 
     public function isDeletable()
     {
-        return !count($this->bid);
+        return $this->bid == null;
+    }
+
+    public function canSetBid()
+    {
+        return $this->bid == null;
     }
 
 }

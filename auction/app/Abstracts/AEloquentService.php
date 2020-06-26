@@ -19,8 +19,23 @@ abstract class AEloquentService
         return $this->mainRepository->all();
     }
 
-    function delete($id){
-        $this->mainRepository->delete($id);
+    function delete($id)
+    {
+        $credentials = ['id' => $id];
+        $model = $this->find($id);
+        if(!$model->isDeletable()){
+            return $this->respondValidateErrorToController(
+                new MessageBag([
+                    'error' => Response::HTTP_BAD_REQUEST.'. Bad request!'
+                ])
+            );
+        }
+        try {
+            $this->mainRepository->delete($id);
+            return $this->respondSuccessfulToController($credentials);
+        } catch (\Exception $e) {
+            return $this->respondInternalErrorToController($e);
+        }
     }
 
     function find($id)

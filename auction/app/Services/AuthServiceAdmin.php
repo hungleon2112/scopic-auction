@@ -4,10 +4,11 @@ namespace App\Services;
 
 use App\Abstracts\AEloquentRepository;
 use App\Abstracts\AEloquentService;
-use App\Interfaces\IAuthService;
+use App\Interfaces_Service\IAuthService;
 use App\Model\Constant;
 use App\Traits\TraitsRespond;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthServiceAdmin extends AEloquentService implements IAuthService
 {
@@ -23,7 +24,20 @@ class AuthServiceAdmin extends AEloquentService implements IAuthService
 
     public function register(Request $request)
     {
-        // Ignore this function because admin can not register and only can create by super admin.
+        try
+        {
+            $credentials = [
+                'name' => 'Admin',
+                'email' => 'admin@admin.com',
+                'username' => 'admin',
+                'role' => Constant::ROLE_ADMIN,
+                'password' => Hash::make('admin')
+            ];
+            $user = $this->mainRepository->create($credentials);
+            return $this->respondSuccessfulToController($credentials);
+        }catch (\Exception $e) {
+            return $this->respondInternalErrorToController($e);
+        }
     }
 
     /**
@@ -33,10 +47,10 @@ class AuthServiceAdmin extends AEloquentService implements IAuthService
     public function login(Request $request)
     {
         // get credentials from request
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('username', 'password');
 
         $validate_bag = $this->validate($credentials, [
-            'email' => 'required|email',
+            'username' => 'required',
             'password' => 'required'
         ]);
         if (count($validate_bag)) {
@@ -45,13 +59,13 @@ class AuthServiceAdmin extends AEloquentService implements IAuthService
         try {
             if (auth('web')->attempt($credentials)) {
                 if(auth('web')->user()->isAdmin()){
-                    return $this->respondSuccessfulToController('logged in', $credentials['email']);
+                    return $this->respondSuccessfulToController($credentials['username']);
                 }
                 auth('web')->logout();
             }
-            return $this->respondUnsuccessfulToController($credentials['email'], Constant::MESSAGE_INVALID_CREDENTIALS);
+            return $this->respondUnsuccessfulToController(Constant::MESSAGE_INVALID_CREDENTIALS);
         } catch (\Exception $e) {
-            return $this->respondInternalErrorToController($credentials['email'], $e);
+            return $this->respondInternalErrorToController($e);
         }
     }
 
@@ -67,5 +81,11 @@ class AuthServiceAdmin extends AEloquentService implements IAuthService
     }
     public function logout(){
         // Implement logout() method.
+    }
+    public function create(Request $request){
+        // Implement create() method.
+    }
+    public function update(Request $request, $id){
+        // Implement update() method.
     }
 }

@@ -18,6 +18,7 @@
                             <th>Name</th>
                             <th>Image</th>
                             <th>Description</th>
+                            <th>Bid Status</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -30,8 +31,10 @@
                                         {{$item->name}}
                                     @endif
                                 </td>
-                                <td>{{$product->image}}</td>
-                                <td>{{$product->description}}</td>
+                                <td>
+                                <img class="img-fluid" style="height: 100px" src="/uploads/{{$item->image}}" /></td>
+                                <td>{{$item->desc}}</td>
+                                <td>{{$item->bid != null ? Constant::BID_STATUS_LABEL[$item->bid->status] :  null}}</td>
                             </tr>
                         @endforeach
                         </tbody>

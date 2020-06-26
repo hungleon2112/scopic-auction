@@ -14,4 +14,9 @@ class Constant
         self::BID_STATUS_IN_COMPLETED => "Completed",
     ];
     
+
+    public const MESSAGE_INVALID_INPUT_UPDATE = "Invalid Input (Item ID or Date Time Format or This Bid cannot be updated)";
+    public const MESSAGE_INVALID_INPUT = "Invalid Input (Item ID or Date Time Format)";
+    public const MESSAGE_INVALID_CREDENTIALS = "Invalid Credentials";
+    public const TOOLTIP_DISABLED_DELETE_BUTTON = 'Can not delete this item because it has related %s.';
 }
