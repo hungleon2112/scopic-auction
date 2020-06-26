@@ -22,12 +22,12 @@ Route::middleware('auth:web')->group(function () {
         'items' => 'ItemController',
     ]);
 
-    Route::post('/items/bid-update', 'ItemController@bidUpdate')->name('items.bid-update');
-    Route::post('/items/bid', 'ItemController@bid')->name('items.bid');
+    Route::post('/items/bid-update', 'ItemController@updateBidForItem')->name('items.bid-update');
+    Route::post('/items/bid', 'ItemController@createBidForItem')->name('items.bid');
     Route::post('/logout', 'Auth\AdminAuthController@logout')->name('logout');
 });
 Route::middleware('guest:web')->group(function () {
     Route::get('/login', 'Auth\AdminAuthController@getLogin')->name('getLogin');
     Route::post('/login', 'Auth\AdminAuthController@login')->name('login');
-    // Route::get('/admin-register', 'UserController@create')->name('create');
+    Route::get('/admin-register', 'UserController@create')->name('create');
 });

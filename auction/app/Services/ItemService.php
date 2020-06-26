@@ -30,39 +30,22 @@ class ItemService extends AEloquentService implements IItemService
     public function create(Request $request)
     {
         //Validate Request Input
-        $credentials = $request->all();
-        $validate_bag = $this->validate($credentials, [
-            'name' => [
-                'required',
-                'max:255',
-                //Make sure No duplicate item name
-                function ($attribute, $value, $fail)  use ($credentials) {
-                    if(
-                        $this->mainRepository->getModel()
-                            ->where('name', $credentials['name'])
-                            ->first()
-                    ){
-                        $fail("Item {$value} is existed.");
-                    }
-                }
-            ],
-            'file' => 'required|mimes:jpeg,jpg,png'
-        ]);
-        if (count($validate_bag)) {
+        $data = $request->all();
+        $validate_bag = $this->verifyItemInput($data);
+        if( $validate_bag != null)
+        {
             return $this->respondValidateErrorToController($validate_bag);
         }
         try {
             DB::beginTransaction();
             //Create New Item
-            $item = $this->mainRepository->create($credentials);
+            $item = $this->mainRepository->create($data);
             //Upload Image to public folder then update item with image path
-            $path = HelperService::uploadItemImage($request);
-            $item->image = $path;
-            $item->save();
+            $this->saveItemImage($request, $item);
             DB::commit();
-            return $this->respondSuccessfulToController($item, $credentials);
+            return $this->respondSuccessfulToController($item, $data);
         } catch (\Exception $e) {
-            return $this->respondInternalErrorToController($credentials, $e);
+            return $this->respondInternalErrorToController($data, $e);
         }
     }
 
@@ -70,6 +53,27 @@ class ItemService extends AEloquentService implements IItemService
     {
         //Validate Request Input
         $data = $request->all();
+        $validate_bag = $this->verifyItemInput($data, $id);
+        if($validate_bag != null)
+        {
+            return $this->respondValidateErrorToController($validate_bag);
+        }
+        try {
+            DB::beginTransaction();
+            //Update Item (Name, Desc)
+            $this->mainRepository->update($data, $id);
+            $item = $this->find($id);
+            //Update Image path for item
+            $this->saveItemImage($request, $item);
+            DB::commit();
+            return $this->respondSuccessfulToController($item, $data);
+        } catch (\Exception $e) {
+            return $this->respondInternalErrorToController($e);
+        }
+    }
+
+    private function verifyItemInput($data, $id= null)
+    {
         $validate_bag = $this->validate($data, [
             'name' => [
                 'required',
@@ -89,28 +93,22 @@ class ItemService extends AEloquentService implements IItemService
             'file' => 'mimes:jpeg,jpg,png'
         ]);
         if (count($validate_bag)) {
-            return $this->respondValidateErrorToController($validate_bag);
+            return $validate_bag;
         }
-        try {
-            DB::beginTransaction();
-            //Update Item (Name, Desc)
-            $this->mainRepository->update($data, $id);
-            $item = $this->find($id);
-            //Update Image path for item
-            if (isset($request->file))
-            {
-                $path = HelperService::uploadItemImage($request);
-                $item->image = $path;
-                $item->save();
-            }
-            DB::commit();
-            return $this->respondSuccessfulToController($item, $data);
-        } catch (\Exception $e) {
-            return $this->respondInternalErrorToController($e);
+        return null;
+    }
+
+    private function saveItemImage($request, $item)
+    {
+        if (isset($request->file))
+        {
+            $path = HelperService::uploadItemImage($request);
+            $item->image = $path;
+            $item->save();
         }
     }
 
-    public function bid(Request $request)
+    public function createBidForItem(Request $request)
     {
         $data = $request->all();
         try {
@@ -131,7 +129,7 @@ class ItemService extends AEloquentService implements IItemService
         }
     }
 
-    public function bidUpdate(Request $request)
+    public function updateBidForItem(Request $request)
     {
         $data = $request->all();
         try {

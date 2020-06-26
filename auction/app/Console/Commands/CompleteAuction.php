@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use \Datetime;
 use App\Model\Constant;
 use App\Model\Bids;
-use App\Jobs\SendEmail;
+use App\Jobs\SendEmailToWinner;
 
 class CompleteAuction extends Command
 {
@@ -48,7 +48,7 @@ class CompleteAuction extends Command
         //Compare Closed Date Time and Current Date Time
         foreach($list_bids as $bid)
         {
-            if(strtotime($bid->closed_date) <= strtotime(date("Y/m/d h:i")) )
+            if(strtotime($bid->closed_date) <= strtotime(date("Y/m/d H:i")) )
             {
                 //Store Array of bid ID for mass updating, avoid call many times to DB
                 $deadline_bid_id_arr[] = $bid->id;
@@ -65,7 +65,7 @@ class CompleteAuction extends Command
         foreach($deadline_bid_obj_arr as $bid)
         {
             //Dispatch Job Queue
-            SendEmail::dispatch($bid)->delay(now()->addSeconds(5));
+            SendEmailToWinner::dispatch($bid)->delay(now()->addSeconds(5));
         }
     }
 }

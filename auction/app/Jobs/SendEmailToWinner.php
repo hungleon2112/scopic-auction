@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Model\Bids;
 use App\Services\HelperService;
 
-class SendEmail implements ShouldQueue
+class SendEmailToWinner implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     private $bid;
@@ -33,7 +33,8 @@ class SendEmail implements ShouldQueue
      */
     public function handle()
     {
-        //Send Email
-
+        //get latest bid detail
+        $latest_bid_detail = $this->bid->bidDetail()->latest()->get();
+        HelperService::sendEmailChangePassword($latest_bid_detail[0]->user, $this->bid->item->name, $latest_bid_detail[0]->price);
     }
 }

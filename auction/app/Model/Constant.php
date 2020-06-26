@@ -19,4 +19,6 @@ class Constant
     public const MESSAGE_INVALID_INPUT = "Invalid Input (Item ID or Date Time Format)";
     public const MESSAGE_INVALID_CREDENTIALS = "Invalid Credentials";
     public const TOOLTIP_DISABLED_DELETE_BUTTON = 'Can not delete this item because it has related %s.';
+
+    public const MAIL_WIN_AUCTION_SUBJECT = "Hi {name}! You have won the item {item} with price {price}.";
 }

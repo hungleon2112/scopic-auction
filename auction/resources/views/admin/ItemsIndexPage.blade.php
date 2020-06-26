@@ -22,7 +22,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($items as $item)
+                        @foreach($items as $key=> $item)
                             <tr>
                                 <td>
                                     @if(!$item->deleted_at)
