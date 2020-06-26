@@ -1,16 +1,13 @@
-<?php namespace App\Traits;
+<?php namespace App\Services;
 
 use App\Model\Constant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-trait TraitsUpload
+class HelperService
 {
-    /**
-     * @param $folder
-     * @return string
-     */
-    public function uploadItemImage(Request $request)
+
+    public static function uploadItemImage(Request $request)
     {
         if (!isset($request->file))
             return null;
@@ -26,4 +23,6 @@ trait TraitsUpload
         }
         return 'files/'.$orignal_filename;
     }
+
+    
 }

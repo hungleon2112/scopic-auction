@@ -24,6 +24,7 @@ class AuthServiceAdmin extends AEloquentService implements IAuthService
 
     public function register(Request $request)
     {
+        //Just to create the first Admin
         try
         {
             $credentials = [
@@ -49,6 +50,7 @@ class AuthServiceAdmin extends AEloquentService implements IAuthService
         // get credentials from request
         $credentials = $request->only('username', 'password');
 
+        //Validate request input
         $validate_bag = $this->validate($credentials, [
             'username' => 'required',
             'password' => 'required'
@@ -56,6 +58,7 @@ class AuthServiceAdmin extends AEloquentService implements IAuthService
         if (count($validate_bag)) {
             return $this->respondValidateErrorToController($validate_bag);
         }
+
         try {
             if (auth('web')->attempt($credentials)) {
                 if(auth('web')->user()->isAdmin()){

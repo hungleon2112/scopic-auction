@@ -7,7 +7,7 @@ use App\Abstracts\AEloquentService;
 use App\Interfaces_Service\IItemService;
 use App\Interfaces_Repository\IBidRepository;
 use App\Model\Constant;
-use App\Traits\TraitsUpload;
+use App\Services\HelperService;
 use App\Traits\TraitsRespond;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,6 @@ use \Datetime;
 
 class ItemService extends AEloquentService implements IItemService
 {
-    use TraitsUpload;
     use TraitsRespond;
     protected $itemRepository;
 
@@ -30,11 +29,13 @@ class ItemService extends AEloquentService implements IItemService
 
     public function create(Request $request)
     {
+        //Validate Request Input
         $credentials = $request->all();
         $validate_bag = $this->validate($credentials, [
             'name' => [
                 'required',
                 'max:255',
+                //Make sure No duplicate item name
                 function ($attribute, $value, $fail)  use ($credentials) {
                     if(
                         $this->mainRepository->getModel()
@@ -52,8 +53,10 @@ class ItemService extends AEloquentService implements IItemService
         }
         try {
             DB::beginTransaction();
+            //Create New Item
             $item = $this->mainRepository->create($credentials);
-            $path = $this->uploadItemImage($request);
+            //Upload Image to public folder then update item with image path
+            $path = HelperService::uploadItemImage($request);
             $item->image = $path;
             $item->save();
             DB::commit();
@@ -65,11 +68,13 @@ class ItemService extends AEloquentService implements IItemService
 
     public function update(Request $request, $id)
     {
+        //Validate Request Input
         $data = $request->all();
         $validate_bag = $this->validate($data, [
             'name' => [
                 'required',
                 'max:255',
+                //Make sure No duplicate item name except the current id
                 function ($attribute, $value, $fail)  use ($data, $id) {
                     if(
                         $this->mainRepository->getModel()
@@ -88,12 +93,13 @@ class ItemService extends AEloquentService implements IItemService
         }
         try {
             DB::beginTransaction();
+            //Update Item (Name, Desc)
             $this->mainRepository->update($data, $id);
             $item = $this->find($id);
-
+            //Update Image path for item
             if (isset($request->file))
             {
-                $path = $this->uploadItemImage($request);
+                $path = HelperService::uploadItemImage($request);
                 $item->image = $path;
                 $item->save();
             }
@@ -110,6 +116,7 @@ class ItemService extends AEloquentService implements IItemService
         try {
             $item = $this->find($data["item_id"]);
             $data = $this->verifyBid($data);
+            //Check if item is valid to set bid
             if ($data && $item && $item->canSetBid()) {
                 $data["status"] = Constant::BID_STATUS_IN_PROGRESS;
                 $this->bidRepository->create($data);
@@ -130,6 +137,7 @@ class ItemService extends AEloquentService implements IItemService
         try {
             $bid = $this->bidRepository->find($data["id"]);
             $data = $this->verifyBid($data);
+            //Check if bid is valid to update (new closed date have to greater than current closed date, bid status must be In Progress)
             if ($data && $bid && $bid->isUpdatable() && (strtotime($bid->closed_date) < strtotime($data["closed_date"])) ) {
                 $bid->closed_date = $data["closed_date"];
                 $bid->save();
@@ -146,6 +154,7 @@ class ItemService extends AEloquentService implements IItemService
 
     private function verifyBid($data)
     {
+        //Validate Request Input and return data
         $validate_bag = $this->validate($data, [
             'closed_date' => 'required',
             'closed_time' => 'required',
