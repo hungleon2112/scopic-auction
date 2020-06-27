@@ -32,7 +32,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                <img class="img-fluid" style="height: 100px" src="/uploads/{{$item->image}}" /></td>
+                                <img class="img-fluid" style="height: 100px" src="/{{$item->image}}" /></td>
                                 <td>{{$item->desc}}</td>
                                 <td>{{$item->bid != null ? Constant::BID_STATUS_LABEL[$item->bid->status] :  null}}</td>
                             </tr>

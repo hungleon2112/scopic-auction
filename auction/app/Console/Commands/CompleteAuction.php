@@ -58,7 +58,7 @@ class CompleteAuction extends Command
         }
 
         //Change Bid Status to Completed
-        Bids::whereIn('id', $deadline_bid_id_arr)->update(['status' => Constant::BID_STATUS_IN_COMPLETED]);
+        Bids::whereIn('id', $deadline_bid_id_arr)->update(['status' => Constant::BID_STATUS_COMPLETED]);
 
         //Send Email to winner
         //To avoid this current schedule have not finish yet (sending email takes time about 1-2s) while another schedule run, we push to the job queue

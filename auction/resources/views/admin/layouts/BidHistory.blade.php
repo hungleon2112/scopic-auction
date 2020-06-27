@@ -27,7 +27,7 @@
                         <div class="form-group text-right">
                             <a href="javascript:void(0)"
                             onclick="if(confirm('Are you sure you want to update bid for this item?')){document.getElementById('bidForm').submit();}"
-                            class="btn btn-danger">Update Bid</a>
+                            class="btn btn-danger">Update Bid (new Closed Date Time must greater than current)</a>
                         </div>
                         @endif
                     </form>

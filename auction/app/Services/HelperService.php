@@ -24,7 +24,7 @@ class HelperService
         )) {
             return false;
         }
-        return 'files/'.$orignal_filename;
+        return 'uploads/files/'.$orignal_filename;
     }
 
     public static function sendEmailChangePassword($user, $item, $price)
@@ -34,5 +34,12 @@ class HelperService
             'item' => $item,
             'price' => $price,
         ]));
+    }
+
+    public static function formatDate($date) {
+        if($date == null){
+            return '';
+        }
+        return date('Y-m-d H:i:s', strtotime($date));
     }
 }

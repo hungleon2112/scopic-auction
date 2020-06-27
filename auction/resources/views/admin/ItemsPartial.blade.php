@@ -11,7 +11,7 @@
     <div class="col-sm-10">
         <input {{!isset($item) ? 'required': ''}} class="form-control mb-2" type="file" name="file" id="">
         @if(isset($item->image))
-            <img class="img-thumbnail" width="200" src="/uploads/{{$item->image}}" />
+            <img class="img-thumbnail" width="200" src="/{{$item->image}}" />
         @endif
     </div>
 </div>

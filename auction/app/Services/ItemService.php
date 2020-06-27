@@ -12,6 +12,10 @@ use App\Traits\TraitsRespond;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use \Datetime;
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class ItemService extends AEloquentService implements IItemService
 {
@@ -43,7 +47,7 @@ class ItemService extends AEloquentService implements IItemService
             //Upload Image to public folder then update item with image path
             $this->saveItemImage($request, $item);
             DB::commit();
-            return $this->respondSuccessfulToController($item, $data);
+            return $this->respondSuccessfulToController($item);
         } catch (\Exception $e) {
             return $this->respondInternalErrorToController($data, $e);
         }
@@ -66,7 +70,7 @@ class ItemService extends AEloquentService implements IItemService
             //Update Image path for item
             $this->saveItemImage($request, $item);
             DB::commit();
-            return $this->respondSuccessfulToController($item, $data);
+            return $this->respondSuccessfulToController($item);
         } catch (\Exception $e) {
             return $this->respondInternalErrorToController($e);
         }
@@ -108,65 +112,93 @@ class ItemService extends AEloquentService implements IItemService
         }
     }
 
-    public function createBidForItem(Request $request)
+    private function verifyItemDetailRequest($data)
     {
-        $data = $request->all();
-        try {
-            $item = $this->find($data["item_id"]);
-            $data = $this->verifyBid($data);
-            //Check if item is valid to set bid
-            if ($data && $item && $item->canSetBid()) {
-                $data["status"] = Constant::BID_STATUS_IN_PROGRESS;
-                $this->bidRepository->create($data);
-            }
-            else
-            {
-                return $this->respondUnsuccessfulToController(Constant::MESSAGE_INVALID_INPUT);
-            }
-            return $this->respondSuccessfulToController($item, $data);
-        } catch (\Exception $e) {
-            return $this->respondInternalErrorToController($e);
-        }
-    }
-
-    public function updateBidForItem(Request $request)
-    {
-        $data = $request->all();
-        try {
-            $bid = $this->bidRepository->find($data["id"]);
-            $data = $this->verifyBid($data);
-            //Check if bid is valid to update (new closed date have to greater than current closed date, bid status must be In Progress)
-            if ($data && $bid && $bid->isUpdatable() && (strtotime($bid->closed_date) < strtotime($data["closed_date"])) ) {
-                $bid->closed_date = $data["closed_date"];
-                $bid->save();
-            }
-            else
-            {
-                return $this->respondUnsuccessfulToController(Constant::MESSAGE_INVALID_INPUT_UPDATE);
-            }
-            return $this->respondSuccessfulToController($bid, $data);
-        } catch (\Exception $e) {
-            return $this->respondInternalErrorToController($e);
-        }
-    }
-
-    private function verifyBid($data)
-    {
-        //Validate Request Input and return data
         $validate_bag = $this->validate($data, [
-            'closed_date' => 'required',
-            'closed_time' => 'required',
-            'item_id' => 'required'
+            'item_id' => 'required',
+        ],
+        [
+            'required' => ':attribute_required',
         ]);
-        if (count($validate_bag)) {
-            return $this->respondValidateErrorToController($validate_bag);
+        if(count($validate_bag)){
+            return $validate_bag;
         }
-        $data["closed_date"] = $data["closed_date"]. " " .$data["closed_time"];
-        if (DateTime::createFromFormat('Y-m-d H:i', $data["closed_date"]) !== FALSE)
-        {
-            return $data;
-        }
-        return false;
+        return null;
     }
 
+    private function bindBidDataforItem($item, $response_model)
+    {
+        $bid_collection = collect($item->bid ?? null)->only(['status', 'closed_date']);
+        $bid_detail_collection = collect($item->bid->bidDetail ?? null);
+        if($bid_collection->isNotEmpty())
+        {
+            $bid_collection["status"] = Constant::BID_STATUS_LABEL[$bid_collection["status"]];
+            $bid_collection["closed_date"] = HelperService::formatDate($bid_collection["closed_date"]);
+            $response_model["bid"] = $bid_collection;
+        }
+        if($bid_detail_collection->isNotEmpty())
+        {
+            foreach($bid_detail_collection as $bid)
+            {
+                $user_collection = collect($bid->user);
+                $bid = collect($bid)->only(['price', 'created_at']);
+                $bid["created_at"] = HelperService::formatDate($bid["created_at"]);
+                $bid["user"] = $user_collection["name"];
+                $response_model["bid_detail"][] = $bid;
+            }
+        }
+        return $response_model;
+    }
+
+    public function itemDetail(Request $request)
+    {
+        try{
+            $data = $request->all();
+            //Validate Input
+            $validate_bag = $this->verifyItemDetailRequest($data);
+            if($validate_bag != null)
+            {
+                return $this->respondValidateErrorToController($validate_bag);
+            }
+            //Find Item
+            $item = $this->mainRepository->find($data['item_id']);
+            if($item)
+            {
+                $response_model = [
+                    'item' => collect($item)->only('name', 'image', 'desc')
+                ];
+                $response_model = $this->bindBidDataforItem($item, $response_model);
+            }
+            else
+            {
+                return $this->respondUnsuccessfulToController(Constant::MESSAGE_INVALID_CREDENTIALS);
+            }
+            return $this->respondSuccessfulToController([
+                'data' => $response_model,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondInternalErrorToController($e);
+        }
+    }
+
+    public function itemList()
+    {
+        try{
+            $items = $this->mainRepository->all();
+            $response_model= [];
+            foreach($items as $item)
+            {
+                $response_model_tmp = [
+                    'item' => collect($item)->only('name', 'image', 'desc')
+                ];
+                $response_model_tmp = $this->bindBidDataforItem($item, $response_model_tmp);
+                $response_model[] = $response_model_tmp;
+            }
+            return $this->respondSuccessfulToController([
+                'data' => $response_model,
+            ]);
+        } catch (\Exception $e) {
+            return $this->respondInternalErrorToController($e);
+        }
+    }
 }

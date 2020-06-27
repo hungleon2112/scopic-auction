@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Abstracts\AEloquentService;
+use App\Interfaces_Service\IBidService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,10 +19,12 @@ use Jobs\SendEmailToWinner;
 class ItemController extends Controller
 {
     protected $itemService;
+    protected $bidService;
 
-    public function __construct(AEloquentService $itemService)
+    public function __construct(AEloquentService $itemService, IBidService $bidService)
     {
         $this->itemService = $itemService;
+        $this->bidService = $bidService;
     }
     /**
      * Display a listing of the resource.
@@ -30,44 +33,6 @@ class ItemController extends Controller
      */
     public function index()
     {
-
-
-        $deadline_bid_id_arr = [];
-        $deadline_bid_obj_arr = [];
-        // Get all In Progress Bid
-        $list_bids = Bids::where('status', Constant::BID_STATUS_IN_PROGRESS)->get();
-        //Compare Closed Date Time and Current Date Time
-        foreach($list_bids as $bid)
-        {
-            if(strtotime($bid->closed_date) <= strtotime(date("Y/m/d H:i")) )
-            {
-                //Store Array of bid ID for mass updating, avoid call many times to DB
-                $deadline_bid_id_arr[] = $bid->id;
-                //Store bid Object for sending email
-                $deadline_bid_obj_arr[] = $bid;
-            }
-        }
-
-        //Change Bid Status to Completed
-        Bids::whereIn('id', $deadline_bid_id_arr)->update(['status' => Constant::BID_STATUS_IN_COMPLETED]);
-
-        //Send Email to winner
-        //To avoid this current schedule have not finish yet (sending email takes time about 1-2s) while another schedule run, we push to the job queue
-        foreach($deadline_bid_obj_arr as $bid)
-        {
-            //Dispatch Job Queue
-            SendEmailToWinner::dispatch($bid)->delay(now()->addSeconds(5));
-        }
-
-
-
-
-
-
-
-
-
-
         return view('admin.ItemsIndexPage', [
             'items' => $this->itemService->all()
         ]);
@@ -157,7 +122,7 @@ class ItemController extends Controller
      */
     public function createBidForItem(Request $request)
     {
-        $response = $this->itemService->createBidForItem($request);
+        $response = $this->bidService->createBidForItem($request);
         return $response->status != Response::HTTP_OK ?
             redirect()->back()->withInput()->withErrors($response->content) :
             redirect()->back()->with(['message' => 'Successfully bid item']);
@@ -165,7 +130,7 @@ class ItemController extends Controller
 
     public function updateBidForItem(Request $request)
     {
-        $response = $this->itemService->updateBidForItem($request);
+        $response = $this->bidService->updateBidForItem($request);
         return $response->status != Response::HTTP_OK ?
             redirect()->back()->withInput()->withErrors($response->content) :
             redirect()->back()->with(['message' => 'Successfully update bid for item']);

@@ -4,6 +4,6 @@ use Illuminate\Http\Request;
 
 interface IItemService
 {
-    public function createBidForItem(Request $request);
-    public function updateBidForItem(Request $request);
+    public function itemList();
+    public function itemDetail(Request $request);
 }
