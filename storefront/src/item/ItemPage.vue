@@ -14,7 +14,15 @@
         <br/>
         <span>{{item.item != null ? item.item.desc : ''}}</span>
         <div class="" v-if="item.bid != undefined">
-            <span v-bind:class="{ 'text-success': item.bid.status == 'In Progress', 'text-danger': item.bid.status == 'Completed' }" >BID Status: {{item.bid.status}} - Closed Date: {{item.bid.closed_date}}</span>
+            <span 
+            v-bind:class="{ 'text-success': item.bid.status == 'In Progress', 'text-danger': item.bid.status == 'Completed' }" >
+            BID Status: {{item.bid.status}} - 
+            Closed Date: {{item.bid.closed_date}}
+            </span>
+            <span v-if="item.bid.status == 'In Progress'"> - 
+            Count Down:
+            </span>
+            <input v-model="org_second" />
             <hr/>
             <!-- Section Winner -->
             <span v-if="item.bid.status == 'Completed' && item.bid_detail != undefined">
@@ -70,7 +78,8 @@ export default {
         return {
             price: '',
             item_id: this.$route.params.item_id,
-            submitted: false
+            submitted: false,
+            org_second: item.bid.count_down
         }
     },
     computed: {

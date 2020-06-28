@@ -25,7 +25,9 @@
                 <tr v-for="item in bid_item" :key="item.name">
                     <td v-if="item !=undefined"><router-link :to="{ name: 'item', params: { item_id: item.id }}">{{item.name}}</router-link></td>
                     <td v-if="item !=undefined"><img style="width:200px" v-bind:src="item.image" /></td>
-                    <td v-if="item !=undefined">{{item.status}}</td>
+                    <td v-if="item !=undefined">{{item.status}} 
+                        <span v-if="item.status == 'Completed'">{{(item.bid_detail_winner == account.user.name) ? ' - Win' : ' - Lose '}}</span>
+                    </td>
                     <td v-if="item !=undefined">{{item.closed_date}}</td>
                     <td>
                         <div v-if="item.status == 'In Progress'">

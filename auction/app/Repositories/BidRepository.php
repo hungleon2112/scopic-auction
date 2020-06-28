@@ -31,7 +31,7 @@ class BidRepository extends AEloquentRepository implements IBidRepository
         ->join('bid_details', 'bids.id', '=', 'bid_details.bid_id')
         ->join('items', 'bids.item_id', '=', 'items.id')
         ->where('user_id', '=', $user_id)
-        ->select(['items.name', 'items.image', 'items.id', 'items.desc', 'bids.closed_date', 'bids.status'])
+        ->select(['items.name', 'items.image', 'items.id', 'items.desc', 'bids.closed_date', 'bids.status', 'bids.id as bid_id'])
         ->groupBy('items.name')
         ->get();
 

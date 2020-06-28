@@ -134,6 +134,7 @@ class ItemService extends AEloquentService implements IItemService
         {
             $bid_collection["status"] = Constant::BID_STATUS_LABEL[$bid_collection["status"]];
             $bid_collection["closed_date"] = HelperService::formatDate($bid_collection["closed_date"]);
+            $bid_collection["count_down"] = strtotime($bid_collection["closed_date"]) - strtotime(date("Y/m/d H:i:s"));
             $response_model["bid"] = $bid_collection;
         }
         if($bid_detail_collection->isNotEmpty())
