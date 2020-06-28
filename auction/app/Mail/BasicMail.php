@@ -17,9 +17,11 @@ class BasicMail extends Mailable
      * @return void
      */
     public $data;
-    public function __construct($data)
+    public $mail_type;
+    public function __construct($data, $mail_type)
     {
         $this->data = $data;
+        $this->mail_type = $mail_type;
     }
 
     /**
@@ -33,12 +35,21 @@ class BasicMail extends Mailable
         $address = env('MAIL_FROM_ADDRESS');
         $name = env('MAIL_FROM_NAME');
 
-        $place_holder = ['{name}', '{item}', '{price}'];
-        $data_relacement = [$this->data['name'], $this->data['item'], $this->data['price']];
-
-        $content = str_replace($place_holder, $data_relacement, Constant::MAIL_WIN_AUCTION_SUBJECT);
-        $subject = str_replace($place_holder, $data_relacement, Constant::MAIL_WIN_AUCTION_SUBJECT);
-
+        switch($this->mail_type)
+        {
+            case  Constant::MAIL_TYPE_WINNER:
+                $place_holder = ['{name}', '{item}', '{price}'];
+                $data_relacement = [$this->data['name'], $this->data['item'], $this->data['price']];
+                $content = str_replace($place_holder, $data_relacement, Constant::MAIL_WIN_AUCTION_SUBJECT);
+                $subject = str_replace($place_holder, $data_relacement, Constant::MAIL_WIN_AUCTION_SUBJECT);
+            break;
+            case  Constant::MAIL_TYPE_OTHER_AUCTIONEER:
+                $place_holder = ['{name}', '{item}', '{price}'];
+                $data_relacement = [$this->data['name'], $this->data['item'], $this->data['price']];
+                $content = str_replace($place_holder, $data_relacement, Constant::MAIL_OTHER_AUCTIONEER_SUBJECT);
+                $subject = str_replace($place_holder, $data_relacement, Constant::MAIL_OTHER_AUCTIONEER_SUBJECT);
+            break;
+        }
         return $this->view('emails.basic')
                     ->from($address, $name)
                     ->subject($subject)

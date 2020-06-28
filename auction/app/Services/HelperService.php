@@ -1,9 +1,6 @@
 <?php namespace App\Services;
 
 use App\Model\Constant;
-use App\Mail\BasicMail;
-
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,19 +24,10 @@ class HelperService
         return 'uploads/files/'.$orignal_filename;
     }
 
-    public static function sendEmailChangePassword($user, $item, $price)
-    {
-        Mail::to($user->email)->send(new BasicMail([
-            'name' => $user->name,
-            'item' => $item,
-            'price' => $price,
-        ]));
-    }
-
     public static function formatDate($date) {
         if($date == null){
             return '';
         }
-        return date('Y-m-d H:i:s', strtotime($date));
+        return date('Y-m-d H:i:s', strtotime($date)) . " (".config('app.timezone') . ")";
     }
 }

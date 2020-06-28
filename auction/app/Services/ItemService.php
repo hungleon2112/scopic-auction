@@ -138,6 +138,10 @@ class ItemService extends AEloquentService implements IItemService
         }
         if($bid_detail_collection->isNotEmpty())
         {
+            if($bid_detail_collection->count() > 1)
+            {
+                $bid_detail_collection = $bid_detail_collection->sortByDesc('price');
+            }
             foreach($bid_detail_collection as $bid)
             {
                 $user_collection = collect($bid->user);
@@ -164,6 +168,7 @@ class ItemService extends AEloquentService implements IItemService
             $item = $this->mainRepository->find($data['item_id']);
             if($item)
             {
+                $item->image = env('APP_URL') ."/" . $item->image;
                 $response_model = [
                     'item' => collect($item)->only('name', 'image', 'desc')
                 ];
@@ -188,8 +193,9 @@ class ItemService extends AEloquentService implements IItemService
             $response_model= [];
             foreach($items as $item)
             {
+                $item->image = env('APP_URL') ."/" . $item->image;
                 $response_model_tmp = [
-                    'item' => collect($item)->only('name', 'image', 'desc')
+                    'item' => collect($item)->only('id', 'name', 'image', 'desc')
                 ];
                 $response_model_tmp = $this->bindBidDataforItem($item, $response_model_tmp);
                 $response_model[] = $response_model_tmp;

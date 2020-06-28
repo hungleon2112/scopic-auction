@@ -20,7 +20,8 @@ class Constant
     public const MESSAGE_INVALID_CREDENTIALS = "Invalid Credentials";
     public const TOOLTIP_DISABLED_DELETE_BUTTON = 'Can not delete this item because it has related %s.';
 
-    public const MAIL_WIN_AUCTION_SUBJECT = "Hi {name}! You have won the item {item} with price {price}.";
+    public const MAIL_WIN_AUCTION_SUBJECT = "Hi {name}! You have won the item {item} with price {price}$.";
+    public const MAIL_OTHER_AUCTIONEER_SUBJECT = "Hi! The item {item} was bid by other auctionner name {name} with price greater than you: {price}$.";
     
     public const MESSAGE_TOKEN_EXPIRED = "Token Expired";
     public const MESSAGE_TOKEN_ABSENT = "Token Absent";
@@ -28,6 +29,11 @@ class Constant
     public const MESSAGE_OK = "Request Success";
 
     public const MESSAGE_INVALID_INPUT_GENERAL = "Invalid Input";
+    public const MESSAGE_ITEM_ID_INVALID = "Invalid Item ID";
+    public const MESSAGE_BID_INVALID = "Invalid Bid";
     public const MESSAGE_PRICE_INVALID = "Invalid Price";
     public const MESSAGE_TIME_INVALID = "Invalid Time";
+
+    public const MAIL_TYPE_WINNER = "winner";
+    public const MAIL_TYPE_OTHER_AUCTIONEER = "other_auctioneer";
 }

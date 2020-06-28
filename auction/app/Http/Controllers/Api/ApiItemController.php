@@ -27,7 +27,7 @@ class ApiItemController extends Controller
     public function items()
     {
         $response = $this->itemService->itemList();
-        return response()->json($response);
+        return response()->json($response->content, $response->status);
     }
 
     public function item(Request $request)

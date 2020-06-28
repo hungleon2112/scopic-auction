@@ -8,6 +8,9 @@ use App\Interfaces_Service\IBidService;
 use App\Interfaces_Repository\IItemRepository;
 use App\Model\Constant;
 use App\Traits\TraitsRespond;
+use App\Traits\TraitsSendEmail;
+use App\Services\HelperService;
+use App\Jobs\SendEmailToOtherAuctioneer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use \Datetime;
@@ -16,14 +19,10 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class BidService extends AEloquentService implements IBidService
 {
-    use TraitsRespond;
-    protected $bidRepository;
-    protected $itemRepository;
+    use TraitsRespond, TraitsSendEmail;
+    protected $bidRepository, $itemRepository;
 
-    public function __construct(
-        AEloquentRepository $bidRepository,
-        IItemRepository $itemRepository
-    )
+    public function __construct(AEloquentRepository $bidRepository,IItemRepository $itemRepository)
     {
         $this->mainRepository = $bidRepository;
         $this->itemRepository = $itemRepository;
@@ -31,13 +30,14 @@ class BidService extends AEloquentService implements IBidService
 
     public function create(Request $request)
     {
-        
+        return null;
     }
 
     public function update(Request $request, $id)
     {
-        
+        return null;
     }
+
     public function createBidForItem(Request $request)
     {
         $data = $request->all();
@@ -108,9 +108,9 @@ class BidService extends AEloquentService implements IBidService
             foreach($bids as $bid)
             {
                 $bid->status = Constant::BID_STATUS_LABEL[$bid->status];
-                $response_model[] = [
-                    'bid' => $bid
-                ];
+                $bid->closed_date = HelperService::formatDate($bid->closed_date);
+                $bid->image = env('APP_URL') ."/" . $bid->image;
+                $response_model[] = $bid;
             }
             return $this->respondSuccessfulToController([
                 'data' => $response_model,
@@ -131,9 +131,9 @@ class BidService extends AEloquentService implements IBidService
             foreach($bids as $bid)
             {
                 $bid->status = Constant::BID_STATUS_LABEL[$bid->status];
-                $response_model[] = [
-                    'bid' => $bid
-                ];
+                $bid->image = env('APP_URL') ."/" . $bid->image;
+                $bid->closed_date = HelperService::formatDate($bid->closed_date);
+                $response_model[] = $bid;
             }
             return $this->respondSuccessfulToController([
                 'data' => $response_model,
@@ -157,18 +157,27 @@ class BidService extends AEloquentService implements IBidService
             'not_in' => ':attribute_not_in',
         ]);
         if(count($validate_bag)){
-            return false;
+            return Constant::MESSAGE_INVALID_INPUT_GENERAL;
         }
         //Get bid from item
         $item = $this->itemRepository->find($data['item_id']);
         if(!$item)
-            return false;
+            return Constant::MESSAGE_ITEM_ID_INVALID;
 
         $bid = $item->bid;
         //Check  bid valid (status)
         if(!$bid || !$bid->isUpdatable())
-            return false;
-            
+            return Constant::MESSAGE_BID_INVALID;
+
+        //Check bid value valid
+        $bid_details = collect($bid->bidDetail)->last();
+        if($bid_details && $data['price'] <= $bid_details->price)
+            return Constant::MESSAGE_PRICE_INVALID;
+
+        //Check  bid timing valid in case the schedule checking deadline not run or not finish yet
+        if(strtotime($bid->closed_date) < strtotime(date("Y/m/d H:i")))
+            return Constant::MESSAGE_TIME_INVALID;
+
         return $bid;
     }
 
@@ -181,23 +190,16 @@ class BidService extends AEloquentService implements IBidService
 
             //Check valid request (for user who try to cheat the request)
             $bid = $this->verifyBidRequest($data);
-            if(!$bid)
-                return $this->respondUnsuccessfulToController(Constant::MESSAGE_INVALID_INPUT_GENERAL);
-
-            //Check bid value valid
-            $bid_details = collect($bid->bidDetail)->last();
-            if($bid_details && $data['price'] <= $bid_details->price)
-                return $this->respondUnsuccessfulToController(Constant::MESSAGE_PRICE_INVALID);
-
-            //Check  bid timing valid in case the schedule checking deadline not run or not finish yet
-            if(strtotime($bid->closed_date) < strtotime(date("Y/m/d H:i")))
-                return $this->respondUnsuccessfulToController(Constant::MESSAGE_TIME_INVALID);
+            if(!is_object($bid))
+                return $this->respondUnsuccessfulToController($bid);
 
             //Bid
             if($this->mainRepository->bid($bid->id, $user->id, $data['price']))
             {
-                //TODO: Dispatch Job to send email for other user have bid this item
-
+                //Get Other Bid Detail of Other Auctioneer from the bid
+                $bid_details = $this->mainRepository->listBidDetailOfBidExceptUser($bid->id, $user->id);
+                //Dispatch Job to send email for other user have bid this item
+                SendEmailToOtherAuctioneer::dispatch($bid_details, $data['price'])->delay(now()->addSeconds(5));
                 return $this->respondSuccessfulToController([
                     'data' => (object)
                         [

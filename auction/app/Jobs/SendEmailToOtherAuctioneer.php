@@ -11,21 +11,22 @@ use App\Model\Bids;
 use App\Services\HelperService;
 use App\Traits\TraitsSendEmail;
 
-class SendEmailToWinner implements ShouldQueue
+class SendEmailToOtherAuctioneer implements ShouldQueue
 {
     use TraitsSendEmail;
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    private $bid;
+    private $bid_details, $price;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($bid)
+    public function __construct($bid_details, $price)
     {
         //
-        $this->bid = $bid;
+        $this->bid_details = $bid_details;
+        $this->price = $price;
     }
 
     /**
@@ -35,8 +36,10 @@ class SendEmailToWinner implements ShouldQueue
      */
     public function handle()
     {
-        //get latest bid detail
-        $latest_bid_detail = $this->bid->bidDetail()->latest()->get();
-        $this->sendEmailTowinner($latest_bid_detail[0]->user, $this->bid->item->name, $latest_bid_detail[0]->price);
+        //get distinct user email except current user id from the bid
+        foreach($this->bid_details  as $bid_detail)
+        {
+            $this->sendEmailToOtherAuctioneer($bid_detail->user, $bid_detail->bid->item->name, $this->price);
+        }
     }
 }

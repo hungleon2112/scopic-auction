@@ -32,6 +32,7 @@ class BidRepository extends AEloquentRepository implements IBidRepository
         ->join('items', 'bids.item_id', '=', 'items.id')
         ->where('user_id', '=', $user_id)
         ->select(['items.name', 'items.image', 'items.id', 'items.desc', 'bids.closed_date', 'bids.status'])
+        ->groupBy('items.name')
         ->get();
 
         return $bids;
@@ -66,4 +67,14 @@ class BidRepository extends AEloquentRepository implements IBidRepository
         return $bid_detail;
     }
 
+    public function listBidDetailOfBidExceptUser($bid_id, $user_id)
+    {
+        $bid_details = BidDetails
+        ::where('bid_id', '=', $bid_id)
+        ->where('user_id', '!=', $user_id)
+        ->groupBy('user_id')
+        ->get();
+
+        return $bid_details;
+    }
 }
