@@ -17,12 +17,14 @@ I) To run Backend / API
 	10) Open Terminal 3
 	11) TO RUN SCHEDULE (CHECK DEADLINE AUCTION): php artisan schedule:run
 	l2) SWAGGER: http://localhost:8000/swagger
+	13) http://localhost:8000
 
 II) To run Storefront
 	1) Open Terminal 4
 	2) cd storefront
 	3) npm install
 	4) npm start
+	5) http://localhost:8080
 	
 III) Mailtrap.io credentials:
 	viethung.nguyen.2112@gmail.com / Aa123456789
