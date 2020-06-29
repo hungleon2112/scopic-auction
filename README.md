@@ -1,4 +1,9 @@
 # scopic-auction
+
+Please note that the Date Time of system is set at UAT
+In admin Login Page or Dashboard, I implement a small script to show a clock, please note when set Auction on the Item and run Schedule
+to check Deadline Auction
+
 I) To run Backend / API
 	1) Open Terminal 1
 	2) cd auction

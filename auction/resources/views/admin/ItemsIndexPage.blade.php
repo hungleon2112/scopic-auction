@@ -18,7 +18,7 @@
                             <th>Name</th>
                             <th>Image</th>
                             <th>Description</th>
-                            <th>Bid Status</th>
+                            <th>Auction Status</th>
                         </tr>
                         </thead>
                         <tbody>
