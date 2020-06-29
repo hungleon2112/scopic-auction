@@ -16,7 +16,7 @@
         <div class="" v-if="item.bid != undefined">
             <span 
             v-bind:class="{ 'text-success': item.bid.status == 'In Progress', 'text-danger': item.bid.status == 'Completed' }" >
-            BID Status: {{item.bid.status}} - 
+            Auction Status: {{item.bid.status}} - 
             Closed Date: {{item.bid.closed_date}}
             </span>
             <!--<span v-if="item.bid.status == 'In Progress'"> - 

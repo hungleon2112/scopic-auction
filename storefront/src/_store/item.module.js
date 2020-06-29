@@ -29,7 +29,6 @@ const actions = {
                 },
                 error => {
                     commit('bidFailure', error);
-                    // console.log(error);
                     dispatch('alert/error', error, { root: true });
                 }
             );

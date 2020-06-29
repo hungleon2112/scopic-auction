@@ -2,7 +2,7 @@
     <div class="col-12">
         <div class="card m-b-20">
             <div class="card-body">
-                <h3>BID this Item</h3>
+                <h3>Auction this Item</h3>
                 <form id="bidForm" method="POST" enctype="multipart/form-data" action="{{route('items.bid')}}">
                     @csrf
                     @method('POST')
@@ -21,8 +21,8 @@
                     </div>
                     <div class="form-group text-right">
                         <a href="javascript:void(0)"
-                        onclick="if(confirm('Are you sure you want to set bid this item?')){document.getElementById('bidForm').submit();}"
-                        class="btn btn-danger">Set Bid</a>
+                        onclick="if(confirm('Are you sure you want to auction this item?')){document.getElementById('bidForm').submit();}"
+                        class="btn btn-danger">Auction</a>
                     </div>
                 </form>
 

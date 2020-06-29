@@ -2,7 +2,7 @@
     <div class="col-12">
         <div class="card m-b-20">
             <div class="card-body">
-                    <h4>BID Status: {{Constant::BID_STATUS_LABEL[$item->bid->status]}}</h4>
+                    <h4>Auction Status: {{Constant::BID_STATUS_LABEL[$item->bid->status]}}</h4>
                     <form id="bidForm" method="POST" enctype="multipart/form-data" action="{{route('items.bid-update')}}">
                         @csrf
                         @method('POST')
@@ -50,7 +50,7 @@
                                 {{$bid->user->name}}
                                 </td>
                                 <td>
-                                {{$bid->price}}</td>
+                                {{$bid->price}}$</td>
                                 <td>{{$bid->created_at}}</td>
                             </tr>
                         @endforeach

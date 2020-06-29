@@ -21,3 +21,7 @@ II) To run Storefront
 	
 III) Mailtrap.io credentials:
 	viethung.nguyen.2112@gmail.com / Aa123456789
+	Because I don't have paid account, so please go to my Demo Inbox, you can see the email come from system.
+	
+IV) Admin credentials:
+	admin/admin

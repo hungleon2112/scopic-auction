@@ -75,6 +75,7 @@ const mutations = {
     },
     registerFailure(state, error) {
         state.status = {};
+        state.message = null;
     }
 };
 

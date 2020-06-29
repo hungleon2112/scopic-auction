@@ -1,5 +1,5 @@
 <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{url('/')}}">Fibretrace</a></li>
+    <li class="breadcrumb-item"><a href="{{url('/')}}">Auction</a></li>
     @if(strpos(\Request::route()->getName(),'index')!==false)
         <li class="breadcrumb-item active">{{str_replace('-',' ', ucfirst(explode('.',\Request::route()->getName())[0]))}}</li>
     @else

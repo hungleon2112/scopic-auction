@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-class FibreTraceDashboardController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
