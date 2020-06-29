@@ -1,0 +1,225 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Laravel and Swagger",
+        "description": "Getting started with Laravel and Swagger",
+        "termsOfService": "",
+        "contact": {
+            "email": "viethung.nguyen.2112@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/api/v1/login": {
+            "post": {
+                "description": "Login",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "username": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{'token' : '....'}"
+                    },
+                    "401": {
+                        "description": "{'error' : 'Invalid Credentials'}"
+                    },
+                    "500": {
+                        "description": "{'error' : 'could_not_create_token'}"
+                    }
+                }
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "description": "Register",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "username": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Server Error"
+                    }
+                }
+            }
+        },
+        "/api/v1/items": {
+            "get": {
+                "description": "List Item",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{'data' : [{ bid:{}, bid_detail:[{}], item:{} }] }"
+                    },
+                    "401": {
+                        "description": "{'error' : 'Token Absent / Expired'}"
+                    }
+                }
+            }
+        },
+        "/api/v1/item": {
+            "get": {
+                "description": "Detail Item",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "item_id",
+                        "in": "query",
+                        "description": "Item ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{'data' : { bid:{}, bid_detail:[{}], item:{} } }"
+                    },
+                    "401": {
+                        "description": "{'error' : 'Token Absent / Expired'}"
+                    }
+                }
+            }
+        },
+        "/api/v1/items-bid": {
+            "get": {
+                "description": "List Item have Bid",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{'data' : [{name, bid_id, bid_detail_winner, closed_date, desc, id, image, status}] }"
+                    },
+                    "401": {
+                        "description": "{'error' : 'Token Absent / Expired'}"
+                    }
+                }
+            }
+        },
+        "/api/v1/items-awarded": {
+            "get": {
+                "description": "List Item have Awarded",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{'data' : [{name, bid_id, closed_date, desc, id, image, status, price}] }"
+                    },
+                    "401": {
+                        "description": "{'error' : 'Token Absent / Expired'}"
+                    }
+                }
+            }
+        },
+        "/api/v1/bid": {
+            "post": {
+                "description": "Make Bid",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Bearer",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "price": {
+                                    "type": "string"
+                                },
+                                "item_id": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request Success"
+                    },
+                    "401": {
+                        "description": "{'error' : 'Token Absent / Expired'}"
+                    }
+                }
+            }
+        }
+        
+    },
+    "definitions": {}
+}

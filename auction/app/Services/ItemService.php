@@ -149,6 +149,7 @@ class ItemService extends AEloquentService implements IItemService
                 $bid = collect($bid)->only(['price', 'created_at']);
                 $bid["created_at"] = HelperService::formatDate($bid["created_at"]);
                 $bid["user"] = $user_collection["name"];
+                $bid["user_id"] = $user_collection["id"];
                 $response_model["bid_detail"][] = $bid;
             }
         }
@@ -169,7 +170,7 @@ class ItemService extends AEloquentService implements IItemService
             $item = $this->mainRepository->find($data['item_id']);
             if($item)
             {
-                $item->image = env('APP_URL') ."/" . $item->image;
+                $item->image = HelperService::imagePath($item->image);
                 $response_model = [
                     'item' => collect($item)->only('name', 'image', 'desc')
                 ];
@@ -194,7 +195,7 @@ class ItemService extends AEloquentService implements IItemService
             $response_model= [];
             foreach($items as $item)
             {
-                $item->image = env('APP_URL') ."/" . $item->image;
+                $item->image = HelperService::imagePath($item->image);
                 $response_model_tmp = [
                     'item' => collect($item)->only('id', 'name', 'image', 'desc')
                 ];

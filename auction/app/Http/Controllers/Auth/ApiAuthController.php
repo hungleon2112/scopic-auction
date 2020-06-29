@@ -20,13 +20,86 @@ class ApiAuthController extends Controller
         $this->apiAuthService = $apiAuthService;
         $this->middleware('cors');
     }
-
+    /**
+         * @SWG\Post(
+         *     path="/api/v1/register",
+         *     description="Register",
+        *     @SWG\Parameter(
+        *          name="body",
+        *          in="body",
+        *          required=true,
+        *          @SWG\Schema(
+        *              @SWG\Property(
+        *                  property="name",
+        *                  type="string"
+        *              ),
+        *              @SWG\Property(
+        *                  property="email",
+        *                  type="string"
+        *              ),
+        *              @SWG\Property(
+        *                  property="username",
+        *                  type="string"
+        *              ),
+        *              @SWG\Property(
+        *                  property="password",
+        *                  type="string"
+        *              ),
+        *          )
+        *     ),
+         *     @SWG\Response(
+         *         response=200,
+         *         description="Request Success",
+         *     ),
+         *     @SWG\Response(
+         *         response=400,
+         *         description="Bad Request"
+         *     ),
+         *     @SWG\Response(
+         *         response=500,
+         *         description="Server Error"
+         *     )
+         * )
+    */
     public function register(Request $request)
     {
         $response = $this->apiAuthService->register($request);
         return response()->json($response->content, $response->status);
     }
 
+    /**
+         * @SWG\Post(
+         *     path="/api/v1/login",
+         *     description="Login",
+        *     @SWG\Parameter(
+        *          name="body",
+        *          in="body",
+        *          required=true,
+        *          @SWG\Schema(
+        *              @SWG\Property(
+        *                  property="username",
+        *                  type="string"
+        *              ),
+        *              @SWG\Property(
+        *                  property="password",
+        *                  type="string"
+        *              )
+        *          )
+        *     ),
+         *     @SWG\Response(
+         *         response=200,
+         *         description="{'token' : '....'}",
+         *     ),
+         *     @SWG\Response(
+         *         response=400,
+         *         description="{'error' : 'Invalid Credentials'}"
+         *     ),
+         *     @SWG\Response(
+         *         response=500,
+         *         description="{'error' : 'could_not_create_token'}"
+         *     )
+         * )
+    */
     public function login(Request $request)
     {
         $response = $this->apiAuthService->login($request);

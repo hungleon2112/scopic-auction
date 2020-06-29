@@ -19,10 +19,10 @@
             BID Status: {{item.bid.status}} - 
             Closed Date: {{item.bid.closed_date}}
             </span>
-            <span v-if="item.bid.status == 'In Progress'"> - 
+            <!--<span v-if="item.bid.status == 'In Progress'"> - 
             Count Down:
             </span>
-            <input v-model="org_second" />
+            <input v-model="org_second" />-->
             <hr/>
             <!-- Section Winner -->
             <span v-if="item.bid.status == 'Completed' && item.bid_detail != undefined">
@@ -58,7 +58,7 @@
             </thead>
             <tbody>
                 <tr
-                 v-bind:class="{ 'table-success': bd.user == account.user.name}"
+                 v-bind:class="{ 'table-success': bd.user_id == account.user.id}"
                  v-for="bd in item.bid_detail" :key="bd.price">
                     <td>{{bd.user}}</td>
                     <td>{{bd.price}}$</td>
@@ -79,7 +79,6 @@ export default {
             price: '',
             item_id: this.$route.params.item_id,
             submitted: false,
-            org_second: item.bid.count_down
         }
     },
     computed: {

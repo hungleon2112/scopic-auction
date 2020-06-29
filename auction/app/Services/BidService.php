@@ -109,7 +109,7 @@ class BidService extends AEloquentService implements IBidService
             {
                 $bid->status = Constant::BID_STATUS_LABEL[$bid->status];
                 $bid->closed_date = HelperService::formatDate($bid->closed_date);
-                $bid->image = env('APP_URL') ."/" . $bid->image;
+                $bid->image = HelperService::imagePath($bid->image);
                 $bid_tmp = $this->mainRepository->find($bid->bid_id);
                 $bid->bid_detail_winner = collect($bid_tmp->bidDetail)->last()->user->name;
                 $response_model[] = $bid;
@@ -133,7 +133,7 @@ class BidService extends AEloquentService implements IBidService
             foreach($bids as $bid)
             {
                 $bid->status = Constant::BID_STATUS_LABEL[$bid->status];
-                $bid->image = env('APP_URL') ."/" . $bid->image;
+                $bid->image = HelperService::imagePath($bid->image);
                 $bid->closed_date = HelperService::formatDate($bid->closed_date);
                 $response_model[] = $bid;
             }

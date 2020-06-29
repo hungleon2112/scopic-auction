@@ -30,4 +30,9 @@ class HelperService
         }
         return date('Y-m-d H:i:s', strtotime($date)) . " (".config('app.timezone') . ")";
     }
+
+    public static function imagePath($image)
+    {
+        return env('APP_URL') ."/" . $image;
+    }
 }
